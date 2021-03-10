@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpResponse } from '@angular/common/http'
-import { Observable } from 'rxjs'
+import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http'
+import { Observable, throwError, Subject } from 'rxjs'
+import { retry, catchError } from 'rxjs/operators'
 
 import { Task } from '../tasks/task.model'
 
@@ -9,13 +10,41 @@ import { Task } from '../tasks/task.model'
 })
 export class TaskService {
 
+  apiURL = 'http://localhost:8080'
+  private tasks: Task[] = []
+  private tasksUpdated = new Subject<Task[]>()
+
   constructor(private http: HttpClient) { }
 
+  /*
   getTasks(): Observable<HttpResponse<Task[]>> {
     return this.http.get<Task[]>(
       '/api/tasks', { observe: 'response' }
     )
   }
+  getTasks(): Observable<Task> {
+    return this.http.get<Task>(
+      this.apiURL + '/api/tasks'
+      //'/api/tasks'
+      )
+      .pipe(retry(1), catchError(this.handleError))
+  }  
+  */
+
+  // Http Options
+  httpOptions = {
+    headers: new HttpHeaders({
+      'Content-Type': 'application/json'
+    })
+  }
+
+  getTasks(): Observable<Task> {
+    return this.http.get<Task>(
+      this.apiURL + '/api/tasks'
+      //'/api/tasks'
+      )
+      .pipe(retry(1), catchError(this.handleError))
+  }  
 
   saveTask(task: Task, checked: boolean): Observable<Task> {
     task.completed = checked;
@@ -49,5 +78,18 @@ export class TaskService {
       `Something bad happened: please try again later.`);
   }
   */
+  // Error handling 
+  handleError(error) {
+    let errorMessage = '';
+    if(error.error instanceof ErrorEvent) {
+      // Get client-side error
+      errorMessage = error.error.message;
+    } else {
+      // Get server-side error
+      errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
+    }
+    window.alert(errorMessage);
+    return throwError(errorMessage);
+ }
 
 }

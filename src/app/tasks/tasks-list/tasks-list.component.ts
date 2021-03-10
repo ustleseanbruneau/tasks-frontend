@@ -9,31 +9,48 @@ import { Task } from '../task.model'
 })
 export class TasksListComponent implements OnInit {
 
-  tasks: Task[] = [];
+  //tasks: Task[] = [];
+  tasks: any = [];
 
   constructor(private taskService: TaskService) { }
 
   ngOnInit(): void {
 
-    // this.tasks.push( new Task(1, "Task 1", true, "10/01/2020"));
-    // this.tasks.push( new Task(2, "Task 2", true, "10/05/2020"));
-    // this.tasks.push( new Task(3, "Task 3", true, "10/11/2020"));
+    // this.tasks.push( new Task("Task 1", true, "10/01/2020"));
+    // this.tasks.push( new Task("Task 2", true, "10/05/2020"));
+    // this.tasks.push( new Task("Task 3", true, "10/11/2020"));
 
+    console.log('initializer method');
     this.getTaskList();
 
-    //this.taskService.onTaskAdded.subscribe(
-    //  (task: Task) => this.tasks.push(task)
-    //);
+    /*
+    this.taskService.getTasks().subscribe(
+      (task: Task) => this.tasks.push(task)
+    );
+    */
   }
 
   getTaskList() {
-    return this.taskService.getTasks().subscribe(resp => {
-      for (const data of resp.body) {
-        this.tasks.push(data);
-      }
-      console.log('added tasks');
+
+    console.log('getTaskList method');
+
+    return this.taskService.getTasks().subscribe((data: {}) => {
+      this.tasks = data;
     })
 
+    /*
+    return this.taskService.getTasks().subscribe(
+      (task: Task) => this.tasks.push(task)
+    )
+    */
+
+    /*
+    return this.taskService.getTasks().subscribe(task => {
+      this.tasks.push(task);
+      console.log('added tasks');
+    })
+    */
+    
   }
 
   getDueDateLabel(task: Task) {
